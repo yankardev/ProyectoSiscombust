@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragmentos :: head('Directorio de Proveedores')}"></head>
+<body class="bg-light">
+
+    <nav th:replace="~{layout/fragmentos :: navbar}"></nav>
+
+    <div class="container mt-4 mb-5">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-secondary"><i class="bi bi-truck text-danger me-2"></i>Gestión de Proveedores</h2>
+            <div>
+                <a th:href="@{/proveedores/reporte}" class="btn btn-outline-danger fw-bold me-2 shadow-sm">
+                    <i class="bi bi-file-earmark-pdf-fill me-1"></i> Informe Financiero
+                </a>
+                <a th:href="@{/proveedores/nuevo}" class="btn btn-danger fw-bold shadow-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Nuevo Proveedor
+                </a>
+            </div>
+        </div>
+
+        <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show fw-bold shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${mensajeError}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show fw-bold shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i><span th:text="${mensajeExito}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm border-start border-primary border-4 h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-bold mb-1">Empresas Asociadas</h6>
+                            <h3 class="fw-bold text-primary mb-0" th:text="${#lists.size(proveedores)}">0</h3>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
+                            <i class="bi bi-building text-primary fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm border-start border-success border-4 h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-bold mb-1">Crédito Total Disponible</h6>
+                            <h3 class="fw-bold text-success mb-0" 
+                                th:text="${proveedores.isEmpty() ? 'S/ 0.00' : 'S/ ' + #numbers.formatDecimal(#aggregates.sum(proveedores.![lineaCredito]), 1, 'COMMA', 2, 'POINT')}">
+                            </h3>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded-circle">
+                            <i class="bi bi-wallet2 text-success fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm border-start border-dark border-4 h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-bold mb-1">Estado de Cuentas</h6>
+                            <h3 class="fw-bold text-dark mb-0">Al día</h3>
+                        </div>
+                        <div class="bg-dark bg-opacity-10 p-3 rounded-circle">
+                            <i class="bi bi-shield-check text-dark fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white pt-3 pb-3 border-bottom-0">
+                <div class="row">
+                    <div class="col-md-4 ms-auto">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-search"></i></span>
+                            <input type="text" id="buscadorProveedores" class="form-control border-start-0" placeholder="Buscar por RUC, nombre...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body pt-0">
+                <table id="tablaProveedores" class="table table-hover table-bordered align-middle text-center w-100">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>RUC</th>
+                            <th>Razón Social</th>
+                            <th>Teléfono</th>
+                            <th>Correo</th>
+                            <th>Crédito Disponible</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${proveedores}">
+                            <td class="fw-bold" th:text="${p.ruc}"></td>
+                            <td th:text="${p.nombreProveedor}"></td>
+                            <td th:text="${p.telefono}"></td>
+                            <td th:text="${p.correo}"></td>
+                            
+                            <td class="fw-bold" 
+                                th:classappend="${p.lineaCredito != null && p.lineaCredito < 500} ? 'text-danger' : 'text-success'"
+                                th:text="${p.lineaCredito != null ? 'S/ ' + #numbers.formatDecimal(p.lineaCredito, 1, 'COMMA', 2, 'POINT') : 'S/ 0.00'}">
+                            </td>
+                            
+                            <td>
+                                <span th:if="${p.lineaCredito != null && p.lineaCredito >= 500}" class="badge bg-success">Crédito OK</span>
+                                <span th:if="${p.lineaCredito != null && p.lineaCredito > 0 && p.lineaCredito < 500}" class="badge bg-warning text-dark">Saldo Bajo</span>
+                                <span th:if="${p.lineaCredito == null || p.lineaCredito <= 0}" class="badge bg-danger">Sin Saldo</span>
+                            </td>
+                            
+                            <td>
+								<button type="button" class="btn btn-sm btn-success fw-bold me-1" 
+								        data-bs-toggle="modal" data-bs-target="#modalRecarga"
+								        th:data-id="${p.idProveedor}"
+								        th:data-nombre="${p.nombreProveedor}"
+								        onclick="prepararRecarga(this.getAttribute('data-id'), this.getAttribute('data-nombre'))">
+								    <i class="bi bi-cash-coin"></i>
+								</button>
+                                
+                                <a th:href="@{/proveedores/editar/{id}(id=${p.idProveedor})}" class="btn btn-sm btn-warning text-dark fw-bold me-1">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a th:href="@{/proveedores/eliminar/{id}(id=${p.idProveedor})}" class="btn btn-sm btn-danger fw-bold" onclick="return confirm('¿Eliminar este proveedor?');">
+                                    <i class="bi bi-trash-fill"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal fade" id="modalRecarga" tabindex="-1" aria-labelledby="modalRecargaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold" id="modalRecargaLabel">
+                        <i class="bi bi-wallet-fill me-2"></i>Abonar a Línea de Crédito
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/proveedores/recargar}" method="post">
+                    <div class="modal-body p-4">
+                        <p class="text-muted mb-4">Estás a punto de registrar un abono financiero para el proveedor: <br>
+                            <strong id="nombreProveedorModal" class="fs-5 text-dark"></strong>
+                        </p>
+                        
+                        <input type="hidden" id="idProveedorModal" name="idProveedor">
+                        
+                        <div class="form-floating mb-3">
+                            <input type="number" step="0.01" min="1" class="form-control fw-bold text-success fs-4" id="montoRecarga" name="monto" required placeholder="0.00">
+                            <label for="montoRecarga">Monto a abonar (S/)</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success fw-bold px-4">Confirmar Recarga</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="~{layout/fragmentos :: scripts}"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const buscador = document.getElementById("buscadorProveedores");
+            const filasTabla = document.querySelectorAll("#tablaProveedores tbody tr");
+
+            if (buscador) {
+                // TRUCO: Limpia la memoria caché del navegador para que no oculte filas
+                buscador.value = ""; 
+
+                buscador.addEventListener("keyup", function() {
+                    const textoBusqueda = buscador.value.toLowerCase();
+                    filasTabla.forEach(function(fila) {
+                        const contenidoFila = fila.textContent.toLowerCase();
+                        fila.style.display = contenidoFila.includes(textoBusqueda) ? "" : "none";
+                    });
+                });
+            }
+        });
+        
+        // Esta función atrapa el ID del botón verde y lo mete al Modal oculto
+        function prepararRecarga(id, nombre) {
+            document.getElementById('idProveedorModal').value = id;
+            document.getElementById('nombreProveedorModal').innerText = nombre;
+            document.getElementById('montoRecarga').value = ''; 
+        }
+    </script>
+</body>
+</html>

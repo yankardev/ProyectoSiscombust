@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" 
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" 
+              name="ReporteConsumos" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a1b2c3d4-e5f6-7890-1234-56789abcdef0">
+    
+    <field name="idConsumo" class="java.lang.Integer"/>
+    <field name="fechaConsumo" class="java.time.LocalDate"/>
+    <field name="vehiculo.placa" class="java.lang.String"/>
+    <field name="proveedor.nombreProveedor" class="java.lang.String"/>
+    <field name="cantidadGalones" class="java.math.BigDecimal"/>
+    <field name="totalSoles" class="java.math.BigDecimal"/>
+
+    <variable name="TotalGalones" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{cantidadGalones} != null ? $F{cantidadGalones} : java.math.BigDecimal.ZERO]]></variableExpression>
+    </variable>
+    <variable name="TotalSoles" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{totalSoles} != null ? $F{totalSoles} : java.math.BigDecimal.ZERO]]></variableExpression>
+    </variable>
+
+    <title>
+        <band height="60">
+            <staticText>
+                <reportElement x="0" y="10" width="555" height="30" forecolor="#C8102E" uuid="b2c3d4e5-f6a7-8901-2345-6789abcdef01"/>
+                <textElement textAlignment="Center">
+                    <font size="20" isBold="true"/>
+                </textElement>
+                <text><![CDATA[INFORME GERENCIAL DE CONSUMOS]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="40" width="555" height="20" forecolor="#666666" uuid="c3d4e5f6-a7b8-9012-3456-789abcdef012"/>
+                <textElement textAlignment="Center">
+                    <font size="12"/>
+                </textElement>
+                <text><![CDATA[Sistema SISCOMBUST - Transportes Rodrigo Carranza S.A.C.]]></text>
+            </staticText>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="30">
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="30" backcolor="#343A40" uuid="d4e5f6a7-b8c9-0123-4567-89abcdef0123"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="5" y="5" width="30" height="20" forecolor="#FFFFFF" uuid="e5f6a7b8-c9d0-1234-5678-9abcdef01234"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[ID]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="40" y="5" width="80" height="20" forecolor="#FFFFFF" uuid="f6a7b8c9-d0e1-2345-6789-abcdef012345"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[FECHA]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="125" y="5" width="75" height="20" forecolor="#FFFFFF" uuid="07b8c9d0-e1f2-3456-789a-bcdef0123456"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[PLACA]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="205" y="5" width="170" height="20" forecolor="#FFFFFF" uuid="18c9d0e1-f2a3-4567-89ab-cdef01234567"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[GRIFO / PROVEEDOR]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="380" y="5" width="80" height="20" forecolor="#FFFFFF" uuid="29d0e1f2-a3b4-5678-9abc-def012345678"/>
+                <textElement textAlignment="Right"><font isBold="true"/></textElement>
+                <text><![CDATA[GALONES]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="465" y="5" width="80" height="20" forecolor="#FFFFFF" uuid="29d0e1f2-a3b4-5678-9abc-def012345678"/>
+                <textElement textAlignment="Right"><font isBold="true"/></textElement>
+                <text><![CDATA[TOTAL (S/.)]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="25">
+            <line>
+                <reportElement x="0" y="24" width="555" height="1" forecolor="#CCCCCC" uuid="3ae1f2a3-b4c5-6789-abcd-ef0123456789"/>
+            </line>
+            <textField>
+                <reportElement x="5" y="5" width="30" height="15" uuid="4bf2a3b4-c5d6-789a-bcde-f0123456789a"/>
+                <textFieldExpression><![CDATA[$F{idConsumo}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="40" y="5" width="80" height="15" uuid="5c03b4c5-d6e7-89ab-cdef-0123456789ab"/>
+                <textFieldExpression><![CDATA[$F{fechaConsumo}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="125" y="5" width="75" height="15" uuid="6d14c5d6-e7f8-9abc-def0-123456789abc"/>
+                <textFieldExpression><![CDATA[$F{vehiculo.placa}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="205" y="5" width="170" height="15" uuid="7e25d6e7-f8a9-abcd-ef01-23456789abcd"/>
+                <textFieldExpression><![CDATA[$F{proveedor.nombreProveedor}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement x="380" y="5" width="80" height="15" uuid="8f36e7f8-a9ba-bcde-f012-3456789abcde"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA[$F{cantidadGalones}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement x="465" y="5" width="80" height="15" uuid="8f36e7f8-a9ba-bcde-f012-3456789abcde"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA[$F{totalSoles}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <summary>
+        <band height="40">
+            <rectangle>
+                <reportElement x="0" y="5" width="555" height="25" backcolor="#E9ECEF" uuid="0e89af60-3136-407e-9762-b911fb6276d3"/>
+                <graphicElement>
+                    <pen lineWidth="1.0" lineColor="#CED4DA"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement x="205" y="10" width="170" height="15" uuid="fa7b66f2-892f-4131-b4ec-bb225db79bba"/>
+                <textElement textAlignment="Right">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[TOTALES GENERALES DE FLOTA:]]></text>
+            </staticText>
+            <textField pattern="#,##0.00">
+                <reportElement x="380" y="10" width="80" height="15" forecolor="#0D6EFD" uuid="ab28811f-c0c8-4dd0-9993-41bbd51d8b7a"/>
+                <textElement textAlignment="Right">
+                    <font isBold="true" size="11"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{TotalGalones}]]></textFieldExpression>
+            </textField>
+            <textField pattern="S/ #,##0.00">
+                <reportElement x="465" y="10" width="80" height="15" forecolor="#DC3545" uuid="ab28811f-c0c8-4dd0-9993-41bbd51d8b7a"/>
+                <textElement textAlignment="Right">
+                    <font isBold="true" size="11"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{TotalSoles}]]></textFieldExpression>
+            </textField>
+        </band>
+    </summary>
+
+</jasperReport>

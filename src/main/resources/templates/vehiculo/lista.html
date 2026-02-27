@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragmentos :: head('Gestión de Vehículos')}"></head>
+<body class="bg-light">
+
+    <nav th:replace="~{layout/fragmentos :: navbar}"></nav>
+
+    <div class="container mt-4 mb-5">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-secondary"><i class="bi bi-bus-front-fill text-primary me-2"></i>Gestión de Flota Vehicular</h2>
+            <div>
+                <a th:href="@{/vehiculos/reporte}" class="btn btn-outline-primary fw-bold me-2 shadow-sm">
+                    <i class="bi bi-file-earmark-pdf-fill me-1"></i> Inventario PDF
+                </a>
+                <a th:href="@{/vehiculos/nuevo}" class="btn btn-primary fw-bold shadow-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Registrar Vehículo
+                </a>
+            </div>
+        </div>
+
+        <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show fw-bold shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${mensajeError}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show fw-bold shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i><span th:text="${mensajeExito}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm border-start border-primary border-4 h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-bold mb-1">Unidades Registradas</h6>
+                            <h3 class="fw-bold text-primary mb-0" th:text="${#lists.size(vehiculos)}">0</h3>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
+                            <i class="bi bi-truck-front-fill text-primary fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm border-start border-warning border-4 h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-bold mb-1">Capacidad Global de Flota</h6>
+                            <h3 class="fw-bold text-warning mb-0" 
+                                th:text="${vehiculos.isEmpty() ? '0 Gal' : #numbers.formatDecimal(#aggregates.sum(vehiculos.![capacidadGalones]), 1, 'COMMA', 2, 'POINT') + ' Gal'}">
+                            </h3>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-3 rounded-circle">
+                            <i class="bi bi-fuel-pump-fill text-warning fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm border-start border-success border-4 h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-bold mb-1">Estado Operativo</h6>
+                            <h3 class="fw-bold text-success mb-0">100% Óptimo</h3>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded-circle">
+                            <i class="bi bi-check-circle-fill text-success fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white pt-3 pb-3 border-bottom-0">
+                <div class="row">
+                    <div class="col-md-4 ms-auto">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-search"></i></span>
+                            <input type="text" id="buscadorVehiculos" class="form-control border-start-0" placeholder="Buscar por placa, marca o modelo...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body pt-0">
+                <table id="tablaVehiculos" class="table table-hover table-bordered align-middle text-center w-100">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>N° Placa</th>
+                            <th>Marca / Modelo</th>
+                            <th>Capacidad Tanque</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="v : ${vehiculos}">
+                            <td>
+                                <span class="badge bg-light text-dark border border-2 border-dark fs-6" style="letter-spacing: 2px;" th:text="${v.placa}"></span>
+                            </td>
+                            
+                            <td th:text="${v.marca + ' - ' + v.modelo}"></td>
+                            
+                            <td class="fw-bold text-secondary" th:text="${v.capacidadGalones + ' Galones'}"></td>
+                            
+							<td>
+                                <span th:if="${v.estado == 'Activo' || v.estado == null}" class="badge bg-success">En Ruta</span>
+                                <span th:if="${v.estado == 'En Mantenimiento'}" class="badge bg-warning text-dark">En Taller</span>
+                                <span th:if="${v.estado == 'Inactivo'}" class="badge bg-danger">De Baja</span>
+                            </td>
+                            
+                            <td>
+                                <a th:href="@{/vehiculos/editar/{id}(id=${v.idVehiculo})}" class="btn btn-sm btn-warning text-dark fw-bold me-1">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a th:href="@{/vehiculos/eliminar/{id}(id=${v.idVehiculo})}" class="btn btn-sm btn-danger fw-bold" onclick="return confirm('¿Eliminar este vehículo de la flota?');">
+                                    <i class="bi bi-trash-fill"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="~{layout/fragmentos :: scripts}"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const buscador = document.getElementById("buscadorVehiculos");
+            const filasTabla = document.querySelectorAll("#tablaVehiculos tbody tr");
+
+            if (buscador) {
+                buscador.value = ""; // Limpiamos caché del buscador
+
+                buscador.addEventListener("keyup", function() {
+                    const textoBusqueda = buscador.value.toLowerCase();
+                    filasTabla.forEach(function(fila) {
+                        const contenidoFila = fila.textContent.toLowerCase();
+                        fila.style.display = contenidoFila.includes(textoBusqueda) ? "" : "none";
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

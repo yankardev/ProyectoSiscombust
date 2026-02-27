@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragmentos :: head('Registro de Consumos')}"></head>
+<body class="bg-light">
+
+    <nav th:replace="~{layout/fragmentos :: navbar}"></nav>
+
+    <div class="container mt-4 mb-5">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-secondary"><i class="bi bi-droplet-fill text-success me-2"></i>Historial de Consumo</h2>
+            <div>
+                <a th:href="@{/consumos/reporte}" class="btn btn-danger fw-bold me-2 shadow-sm">
+                    <i class="bi bi-file-earmark-pdf-fill me-1"></i> Descargar PDF
+                </a>
+                <a th:href="@{/consumos/nuevo}" class="btn btn-success fw-bold shadow-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Registrar Abastecimiento
+                </a>
+            </div>
+        </div>
+
+        <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show fw-bold shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span th:text="${mensajeError}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show fw-bold shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${mensajeExito}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm border-start border-primary border-4 h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-bold mb-1">Total Abastecimientos</h6>
+                            <h3 class="fw-bold text-primary mb-0" th:text="${#lists.size(consumos)}">0</h3>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
+                            <i class="bi bi-receipt-cutoff text-primary fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm border-start border-danger border-4 h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-bold mb-1">Gasto Total Flota</h6>
+                            <h3 class="fw-bold text-danger mb-0" 
+                                th:text="${consumos.isEmpty() ? 'S/ 0.00' : 'S/ ' + #numbers.formatDecimal(#aggregates.sum(consumos.![totalSoles]), 1, 'COMMA', 2, 'POINT')}">
+                            </h3>
+                        </div>
+                        <div class="bg-danger bg-opacity-10 p-3 rounded-circle">
+                            <i class="bi bi-cash-stack text-danger fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm border-start border-success border-4 h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-bold mb-1">Volumen Consumido</h6>
+                            <h3 class="fw-bold text-success mb-0" 
+                                th:text="${consumos.isEmpty() ? '0 Gal' : #numbers.formatDecimal(#aggregates.sum(consumos.![cantidadGalones]), 1, 'COMMA', 2, 'POINT') + ' Gal'}">
+                            </h3>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded-circle">
+                            <i class="bi bi-fuel-pump-fill text-success fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white pt-3 pb-3 border-bottom-0">
+                <div class="row">
+                    <div class="col-md-4 ms-auto">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-search"></i></span>
+                            <input type="text" id="buscadorNativo" class="form-control border-start-0" placeholder="Buscar placa, proveedor, fecha...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body pt-0">
+                <table id="tablaConsumos" class="table table-hover table-bordered align-middle text-center w-100">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Vehículo (Placa)</th>
+                            <th>Proveedor</th>
+                            <th>Combustible</th>
+                            <th>Galones</th>
+                            <th>Costo x Galón</th>
+                            <th>Total (S/.)</th>
+                            <th>Auditoría</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="c : ${consumos}">
+                            <td th:text="${c.fechaConsumo}"></td>
+                            <td th:text="${c.vehiculo.placa}" class="fw-bold text-primary"></td>
+                            <td th:text="${c.proveedor.nombreProveedor}"></td>
+                            <td th:text="${c.combustible.nombre}"></td>
+                            <td th:text="${c.cantidadGalones}"></td>
+                            <td th:text="${'S/ ' + #numbers.formatDecimal((c.totalSoles / c.cantidadGalones), 1, 'COMMA', 2, 'POINT')}"></td>
+                            <td class="text-success fw-bold" th:text="${'S/ ' + #numbers.formatDecimal(c.totalSoles, 1, 'COMMA', 2, 'POINT')}"></td>
+                            <td>
+                                <span class="badge bg-dark" th:text="${c.usuarioRegistro != null ? c.usuarioRegistro : 'Sistema'}"></span>
+                            </td>
+                            <td>
+                                <a th:href="@{/consumos/editar/{id}(id=${c.idConsumo})}" class="btn btn-sm btn-warning text-dark fw-bold me-1">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a th:href="@{/consumos/eliminar/{id}(id=${c.idConsumo})}" class="btn btn-sm btn-danger fw-bold" onclick="return confirm('¿Eliminar este registro?');">
+                                    <i class="bi bi-trash-fill"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="~{layout/fragmentos :: scripts}"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const buscador = document.getElementById("buscadorNativo");
+            const filasTabla = document.querySelectorAll("#tablaConsumos tbody tr");
+
+            buscador.addEventListener("keyup", function() {
+                const textoBusqueda = buscador.value.toLowerCase();
+                
+                filasTabla.forEach(function(fila) {
+                    // Obtiene todo el texto de la fila (Placa, Proveedor, Fecha, etc.)
+                    const contenidoFila = fila.textContent.toLowerCase();
+                    
+                    // Si el texto de búsqueda está en la fila, la muestra; si no, la oculta
+                    if (contenidoFila.includes(textoBusqueda)) {
+                        fila.style.display = "";
+                    } else {
+                        fila.style.display = "none";
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

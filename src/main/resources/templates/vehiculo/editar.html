@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragmentos :: head('Editar Vehículo')}"></head>
+<body class="bg-light">
+
+    <nav th:replace="~{layout/fragmentos :: navbar}"></nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header text-dark fw-bold bg-warning">Editar Vehículo</div>
+                    <div class="card-body p-4">
+                        <form th:action="@{/vehiculos/guardar}" th:object="${vehiculo}" method="post">
+                            <input type="hidden" th:field="*{idVehiculo}" />
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Placa</label>
+                                <input type="text" th:field="*{placa}" class="form-control text-uppercase" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Marca</label>
+                                <input type="text" th:field="*{marca}" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Modelo</label>
+                                <input type="text" th:field="*{modelo}" class="form-control">
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Capacidad en Galones</label>
+                                <input type="number" step="0.01" th:field="*{capacidadGalones}" class="form-control" required>
+                            </div>
+							<div class="col-md-6 mb-3">
+					            <div class="form-floating">
+					                <select class="form-select fw-bold text-primary" id="estado" th:field="*{estado}" required>
+					                    <option value="Activo">🟢 Activo (En Ruta)</option>
+					                    <option value="En Mantenimiento">🟡 En Mantenimiento (Taller)</option>
+					                    <option value="Inactivo">🔴 De Baja (Inactivo)</option>
+					                </select>
+					                <label for="estado">Estado Operativo</label>
+					            </div>
+					        </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Tipo de Combustible (Requerido)</label>
+                                <select th:field="*{combustible}" class="form-select" required>
+                                    <option value="">-- Seleccione el combustible del vehículo --</option>
+                                    <option th:each="c : ${combustibles}" th:value="${c.idCombustible}" th:text="${c.nombre}"></option>
+                                </select>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/vehiculos}" class="btn btn-secondary">Cancelar</a>
+                                <button type="submit" class="btn btn-warning fw-bold">Actualizar Vehículo</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="~{layout/fragmentos :: scripts}"></div>
+</body>
+</html>

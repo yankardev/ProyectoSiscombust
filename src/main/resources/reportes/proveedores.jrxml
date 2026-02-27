@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" 
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" 
+              name="ReporteProveedores" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a1b2c3d4-0000-0000-0000-000000000001">
+    
+    <field name="idProveedor" class="java.lang.Integer"/>
+    <field name="nombreProveedor" class="java.lang.String"/>
+    <field name="ruc" class="java.lang.String"/>
+    <field name="telefono" class="java.lang.String"/>
+    <field name="correo" class="java.lang.String"/>
+    <field name="lineaCredito" class="java.math.BigDecimal"/>
+
+    <variable name="TotalCredito" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{lineaCredito} != null ? $F{lineaCredito} : java.math.BigDecimal.ZERO]]></variableExpression>
+    </variable>
+
+    <title>
+        <band height="60">
+            <staticText>
+                <reportElement x="0" y="10" width="555" height="30" forecolor="#C8102E" uuid="a1b2c3d4-0000-0000-0000-000000000002"/>
+                <textElement textAlignment="Center">
+                    <font size="20" isBold="true"/>
+                </textElement>
+                <text><![CDATA[INFORME GERENCIAL DE PROVEEDORES]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="0" y="40" width="555" height="20" forecolor="#666666" uuid="a1b2c3d4-0000-0000-0000-000000000003"/>
+                <textElement textAlignment="Center">
+                    <font size="12"/>
+                </textElement>
+                <text><![CDATA[Sistema SISCOMBUST - Transportes Rodrigo Carranza S.A.C.]]></text>
+            </staticText>
+        </band>
+    </title>
+
+    <columnHeader>
+        <band height="30">
+            <rectangle>
+                <reportElement x="0" y="0" width="555" height="30" backcolor="#343A40" uuid="a1b2c3d4-0000-0000-0000-000000000004"/>
+            </rectangle>
+            <staticText>
+                <reportElement x="5" y="5" width="25" height="20" forecolor="#FFFFFF" uuid="a1b2c3d4-0000-0000-0000-000000000005"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[ID]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="35" y="5" width="155" height="20" forecolor="#FFFFFF" uuid="a1b2c3d4-0000-0000-0000-000000000006"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[RAZÓN SOCIAL]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="195" y="5" width="80" height="20" forecolor="#FFFFFF" uuid="a1b2c3d4-0000-0000-0000-000000000007"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[RUC]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="280" y="5" width="75" height="20" forecolor="#FFFFFF" uuid="a1b2c3d4-0000-0000-0000-000000000008"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[TELÉFONO]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="360" y="5" width="115" height="20" forecolor="#FFFFFF" uuid="a1b2c3d4-0000-0000-0000-000000000009"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[CORREO]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="480" y="5" width="70" height="20" forecolor="#FFFFFF" uuid="a1b2c3d4-0000-0000-0000-000000000009"/>
+                <textElement><font isBold="true"/></textElement>
+                <text><![CDATA[CRÉDITO (S/)]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="25">
+            <line>
+                <reportElement x="0" y="24" width="555" height="1" forecolor="#CCCCCC" uuid="a1b2c3d4-0000-0000-0000-000000000010"/>
+            </line>
+            <textField>
+                <reportElement x="5" y="5" width="25" height="15" uuid="a1b2c3d4-0000-0000-0000-000000000011"/>
+                <textFieldExpression><![CDATA[$F{idProveedor}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="35" y="5" width="155" height="15" uuid="a1b2c3d4-0000-0000-0000-000000000012"/>
+                <textFieldExpression><![CDATA[$F{nombreProveedor}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="195" y="5" width="80" height="15" uuid="a1b2c3d4-0000-0000-0000-000000000013"/>
+                <textFieldExpression><![CDATA[$F{ruc}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="280" y="5" width="75" height="15" uuid="a1b2c3d4-0000-0000-0000-000000000014"/>
+                <textFieldExpression><![CDATA[$F{telefono} == null ? "-" : $F{telefono}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="360" y="5" width="115" height="15" uuid="a1b2c3d4-0000-0000-0000-000000000015"/>
+                <textFieldExpression><![CDATA[$F{correo} == null ? "-" : $F{correo}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement x="480" y="5" width="70" height="15" uuid="a1b2c3d4-0000-0000-0000-000000000015"/>
+                <textFieldExpression><![CDATA[$F{lineaCredito} != null ? $F{lineaCredito} : java.math.BigDecimal.ZERO]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <summary>
+        <band height="40">
+            <rectangle>
+                <reportElement x="300" y="5" width="255" height="25" backcolor="#E9ECEF" uuid="0e89af60-3136-407e-9762-b911fb6276d3"/>
+                <graphicElement>
+                    <pen lineWidth="1.0" lineColor="#CED4DA"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement x="310" y="10" width="150" height="15" uuid="fa7b66f2-892f-4131-b4ec-bb225db79bba"/>
+                <textElement textAlignment="Right">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[CRÉDITO TOTAL DISPONIBLE:]]></text>
+            </staticText>
+            <textField pattern="S/ #,##0.00">
+                <reportElement x="470" y="10" width="80" height="15" forecolor="#198754" uuid="ab28811f-c0c8-4dd0-9993-41bbd51d8b7a"/>
+                <textElement>
+                    <font isBold="true" size="11"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{TotalCredito}]]></textFieldExpression>
+            </textField>
+        </band>
+    </summary>
+
+</jasperReport>

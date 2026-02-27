@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout/fragmentos :: head('Dashboard - SISCOMBUST')}"></head>
+<body class="bg-light">
+
+    <nav th:replace="~{layout/fragmentos :: navbar}"></nav>
+
+    <div class="container mt-5">
+        <div class="row text-center mb-4">
+            <div class="col-12">
+                <h1 class="display-5 fw-bold text-secondary">¡Bienvenido al Sistema!</h1>
+                <p class="lead text-muted">Selecciona el módulo en el que deseas trabajar o revisa las estadísticas.</p>
+                <hr class="my-4">
+            </div>
+        </div>
+        
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-4 mb-4" sec:authorize="hasAnyAuthority('Administrador', 'Logistica')">
+                <div class="card shadow-sm border-0 text-center p-4 h-100">
+                    <i class="bi bi-truck text-danger" style="font-size: 4rem;"></i>
+                    <h3 class="fw-bold mt-3">Proveedores</h3>
+                    <p class="text-muted small">Gestión de empresas</p>
+                    <a th:href="@{/proveedores}" class="btn btn-outline-danger w-100 fw-bold mt-auto">Ingresar</a>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm border-0 text-center p-4 h-100">
+                    <i class="bi bi-bus-front-fill text-primary" style="font-size: 4rem;"></i>
+                    <h3 class="fw-bold mt-3">Vehículos</h3>
+                    <p class="text-muted small">Gestión de flota</p>
+                    <a th:href="@{/vehiculos}" class="btn btn-outline-primary w-100 fw-bold mt-auto">Ingresar</a>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm border-0 text-center p-4 h-100">
+                    <i class="bi bi-fuel-pump text-success" style="font-size: 4rem;"></i>
+                    <h3 class="fw-bold mt-3">Combustibles</h3>
+                    <p class="text-muted small">Tipos y precios</p>
+                    <a th:href="@{/combustibles}" class="btn btn-outline-success w-100 fw-bold mt-auto">Ingresar</a>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-4">
+                <div class="card shadow-sm border-0 text-center p-4 h-100">
+                    <i class="bi bi-droplet-half text-info" style="font-size: 4rem;"></i>
+                    <h3 class="fw-bold mt-3">Consumos</h3>
+                    <p class="text-muted small">Registro de abastecimiento</p>
+                    <a th:href="@{/consumos}" class="btn btn-outline-info w-100 fw-bold mt-auto">Ingresar</a>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4" sec:authorize="hasAuthority('Administrador')">
+                <div class="card shadow-sm border-0 text-center p-4 h-100">
+                    <i class="bi bi-people-fill text-dark" style="font-size: 4rem;"></i>
+                    <h3 class="fw-bold mt-3">Usuarios</h3>
+                    <p class="text-muted small">Gestión de accesos</p>
+                    <a th:href="@{/usuarios}" class="btn btn-outline-dark w-100 fw-bold mt-auto">Ingresar</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-12 mb-3">
+                <h3 class="fw-bold text-secondary border-bottom pb-2">
+                    <i class="bi bi-graph-up-arrow me-2"></i>Estadísticas de Flota
+                </h3>
+            </div>
+            
+            <div class="col-lg-7 mb-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-white fw-bold text-primary">
+                        Consumo de Galones por Vehículo
+                    </div>
+                    <div class="card-body">
+                        <canvas id="graficoVehiculos"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5 mb-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-white fw-bold text-danger">
+                        Gasto Total por Proveedor (S/.)
+                    </div>
+                    <div class="card-body d-flex justify-content-center">
+                        <canvas id="graficoProveedores" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <div th:replace="~{layout/fragmentos :: scripts}"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            fetch('/api/dashboard')
+                .then(response => response.json())
+                .then(data => {
+                    
+                    // Gráfico de Vehículos
+                    if(data.labelsVehiculos && data.labelsVehiculos.length > 0) {
+                        new Chart(document.getElementById('graficoVehiculos'), {
+                            type: 'bar',
+                            data: {
+                                labels: data.labelsVehiculos,
+                                datasets: [{
+                                    label: 'Galones Consumidos',
+                                    data: data.dataVehiculos,
+                                    backgroundColor: 'rgba(13, 110, 253, 0.7)',
+                                    borderColor: 'rgb(13, 110, 253)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+                        });
+                    } else {
+                        document.getElementById('graficoVehiculos').parentElement.innerHTML = '<p class="text-center text-muted mt-4">Aún no hay consumos registrados.</p>';
+                    }
+
+                    // Gráfico de Proveedores
+                    if(data.labelsProveedores && data.labelsProveedores.length > 0) {
+                        new Chart(document.getElementById('graficoProveedores'), {
+                            type: 'doughnut',
+                            data: {
+                                labels: data.labelsProveedores,
+                                datasets: [{
+                                    data: data.dataProveedores,
+                                    backgroundColor: ['#dc3545', '#198754', '#ffc107', '#0dcaf0', '#6f42c1', '#fd7e14'],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: { responsive: true, maintainAspectRatio: false }
+                        });
+                    } else {
+                        document.getElementById('graficoProveedores').parentElement.innerHTML = '<p class="text-center text-muted mt-4">Aún no hay consumos registrados.</p>';
+                    }
+                    
+                })
+                .catch(error => console.error("Error al cargar los gráficos:", error));
+        });
+    </script>
+</body>
+</html>

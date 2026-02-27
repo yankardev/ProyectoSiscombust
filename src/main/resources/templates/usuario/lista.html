@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/fragmentos :: head('Gestión de Usuarios')}"></head>
+<body class="bg-light">
+
+    <nav th:replace="~{layout/fragmentos :: navbar}"></nav>
+
+    <div class="container mt-4 mb-5">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-secondary"><i class="bi bi-people-fill text-info me-2"></i>Usuarios del Sistema</h2>
+            <div>
+                <a th:href="@{/usuarios/nuevo}" class="btn btn-info text-dark fw-bold shadow-sm">
+                    <i class="bi bi-person-plus-fill me-1"></i> Nuevo Usuario
+                </a>
+            </div>
+        </div>
+
+        <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show fw-bold shadow-sm" role="alert">
+            <i class="bi bi-shield-x me-2"></i><span th:text="${mensajeError}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show fw-bold shadow-sm" role="alert">
+            <i class="bi bi-shield-check me-2"></i><span th:text="${mensajeExito}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm border-start border-primary border-4 h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-bold mb-1">Cuentas Registradas</h6>
+                            <h3 class="fw-bold text-primary mb-0" th:text="${#lists.size(usuarios)}">0</h3>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
+                            <i class="bi bi-person-badge-fill text-primary fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm border-start border-info border-4 h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-bold mb-1">Control de Acceso</h6>
+                            <h3 class="fw-bold text-info mb-0">Estricto</h3>
+                        </div>
+                        <div class="bg-info bg-opacity-10 p-3 rounded-circle">
+                            <i class="bi bi-fingerprint text-info fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm border-start border-success border-4 h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-bold mb-1">Estado de Seguridad</h6>
+                            <h3 class="fw-bold text-success mb-0">Protegido</h3>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded-circle">
+                            <i class="bi bi-shield-lock-fill text-success fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white pt-3 pb-3 border-bottom-0">
+                <div class="row">
+                    <div class="col-md-4 ms-auto">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white text-muted border-end-0"><i class="bi bi-search"></i></span>
+                            <input type="text" id="buscadorUsuarios" class="form-control border-start-0" placeholder="Buscar usuario o rol...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body pt-0">
+                <table id="tablaUsuarios" class="table table-hover table-bordered align-middle text-center w-100">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre Completo</th>
+                            <th>Usuario (Login)</th>
+                            <th>Nivel de Acceso (Rol)</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="usr : ${usuarios}">
+                            <td class="text-muted" th:text="${usr.idUsuario}"></td>
+                            
+                            <td class="fw-bold text-dark text-start" th:text="${usr.nombreCompleto}"></td>
+                            
+                            <td><span class="badge bg-light text-primary border border-primary fw-bold fs-6" style="font-family: monospace;" th:text="${usr.nombreUsuario}"></span></td>
+                            
+                            <td>
+                                <span class="badge bg-secondary px-3 py-2" th:text="${usr.rol}"></span>
+                            </td>
+                            
+                            <td>
+                                <a th:href="@{/usuarios/editar/{id}(id=${usr.idUsuario})}" class="btn btn-sm btn-warning text-dark fw-bold me-1">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a th:href="@{/usuarios/eliminar/{id}(id=${usr.idUsuario})}" class="btn btn-sm btn-danger fw-bold" onclick="return confirm('¿Seguro que deseas revocar el acceso a este usuario?');">
+                                    <i class="bi bi-trash-fill"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div th:replace="~{layout/fragmentos :: scripts}"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const buscador = document.getElementById("buscadorUsuarios");
+            const filasTabla = document.querySelectorAll("#tablaUsuarios tbody tr");
+            if (buscador) {
+                buscador.value = ""; 
+                buscador.addEventListener("keyup", function() {
+                    const textoBusqueda = buscador.value.toLowerCase();
+                    filasTabla.forEach(function(fila) {
+                        const contenidoFila = fila.textContent.toLowerCase();
+                        fila.style.display = contenidoFila.includes(textoBusqueda) ? "" : "none";
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
